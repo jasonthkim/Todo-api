@@ -119,8 +119,35 @@ app.put('/todos/:id', function(req, res) {
 	});
 });
 
+//POST function for the new 'user'
+app.post('/users', function (req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+
+	db.user.create(body).then(function(user) {
+		res.json(user.toJSON());
+	}, function(e) {
+		res.status(400).json(e);
+	});
+});
+
+//Starts up the sql db server
 db.sequelize.sync().then(function() {
 	app.listen(PORT, function() {
 		console.log('Express listening on port: ' + PORT + "!");
 	});
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
