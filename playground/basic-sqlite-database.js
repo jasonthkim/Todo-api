@@ -19,48 +19,44 @@ var Todo = sequelize.define('todo', {
 	}
 });
 
+var User = sequelize.define('user', {
+	email: {
+		type: Sequelize.STRING
+	}
+});
+
+// Associations create and filter by 'userId'
+// This allows me to link tables automatically by sql commands.
+// Needed for cabbyMe web applications. Future implementation for SD SaaS
+Todo.belongsTo(User);
+User.hasMany(Todo);
+
 sequelize.sync({
-	//force: true // force set to true will wipe the database and recreate it. **BE CAREFUL**
+	// force: true // force set to true will wipe the database and recreate it. **BE CAREFUL**
 }).then(function() {
 	console.log('Everything is synced');
 
-	// Fetch a todo item by id
-	// print to screen by json or if error print it out
-
-	Todo.findById(32).then(function (todo) {
-		if (todo) {
-			console.log(todo.toJSON());
-		} else {
-			console.log('Todo not found');
-		}
+	User.findById(1).then(function (user) {
+		user.getTodos({
+			where: {
+				completed: false
+			}
+		}).then(function (todos) {
+			todos.forEach(function(todo) {
+				console.log(todo.toJSON());
+			});
+		});
 	});
 
-
-	// Todo.create({
-	// 	description: 'Take out the trash',
-	// 	//completed: false
-	// }).then(function(todo) {
-	// 	return Todo.create({
-	// 		description: 'Clean office later'
-	// 	});
+	// User.create({
+	// 	email: 'jasonthkim@gmail.com'
 	// }).then(function () {
-	// 	//return Todo.findById(1)
-	// 	return Todo.findAll ({
-	// 		where: {
-	// 			description: {
-	// 				$like: '%trash%'
-	// 			}
-	// 		}
+	// 	return Todo.create({
+	// 		description: 'clean carpet'
 	// 	});
-	// }).then(function (todos) {
-	// 	if (todos) {
-	// 		todos.forEach(function (todo) {
-	// 			console.log(todo.toJSON());
-	// 		});
-	// 	} else {
-	// 		console.log('no todo found!');
-	// 	}
-	// }).catch(function (e) {
-	// 	console.log(e);
+	// }).then(function (todo) {
+	// 	User.findById(1).then(function (user) {
+	// 		user.addTodo(todo);
+	// 	});
 	// });
 });
