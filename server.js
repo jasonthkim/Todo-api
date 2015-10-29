@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var _ = require('underscore');
 var db = require('./db.js');
+var bcrypt = require('bcrypt');
 
 var app = express();
 var PORT = process.env.PORT || 3000;
@@ -119,7 +120,7 @@ app.put('/todos/:id', function(req, res) {
 	});
 });
 
-//POST function for the new 'user'
+// POST function for the new 'user'
 app.post('/users', function (req, res) {
 	var body = _.pick(req.body, 'email', 'password');
 
@@ -130,10 +131,24 @@ app.post('/users', function (req, res) {
 	});
 });
 
+// POST /users/login
+app.post('/users/login', function (req, res) {
+	var body = _.pick(req.body, 'email', 'password');
+
+	db.user.authenticate(body).then(function (user) {
+		res.json(user.toPublicJSON());
+	}, function () {
+		res.status(401).send();
+	});
+});
+
+
+
+
 // Starts up the sql db server
 // {force: true} -> that causes the database table to be recreated. be carefule
 // db.sequelize.sync({force: true}).then(function() {
-db.sequelize.sync().then(function() {
+db.sequelize.sync({force: true}).then(function() {
 	app.listen(PORT, function() {
 		console.log('Express listening on port: ' + PORT + "!");
 	});
